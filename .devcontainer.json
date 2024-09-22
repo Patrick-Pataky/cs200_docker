@@ -1,0 +1,31 @@
+{
+    "name": "cs200",
+    "image": "ppataky5/cs200:latest",
+    "remoteUser": "root",
+    "containerUser": "cs200",
+    // share the local workspace folder with the container
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/cs200/workspace,type=bind",
+    "workspaceFolder": "/home/cs200/workspace",
+    // postAttachCommand: copy templates to workspace only if not overwriting existing files
+    "postAttachCommand": "rsync -a --ignore-existing /tmp/cs200/src/ /home/cs200/workspace && chown -R cs200:cs200 /home/cs200/workspace",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "editor.formatOnSave": true,
+                "terminal.integrated.shellIntegration.enabled": true,
+                "files.autoSave": "afterDelay",
+                "files.autoSaveDelay": 1000,
+                "memory-view.trackDebuggers": [
+                    "cs200"
+                ]
+            },
+            "extensions": [
+                "mshr-h.veriloghdl",
+                "zhwu95.riscv",
+                "cs200.cs200",
+                "mcu-debug.memory-view",
+                "lramseyer.vaporview"
+            ]
+        }
+    }
+}

@@ -5,7 +5,7 @@
 ### Clone the repository
 Go to the directory where you want to work on the labs and run the following command:
 ```bash
-wget https://github.com/Patrick-Pataky/cs200/blob/main/.devcontainer.json
+wget https://github.com/Patrick-Pataky/cs200_docker/blob/main/.devcontainer.json
 ```
 
 ### Install docker desktop and devcontainer extension for VSCode

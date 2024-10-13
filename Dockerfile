@@ -8,7 +8,7 @@ ENV PASSWORD=epfl
 
 # Must be x86_64, macOS, or arm64
 ENV ARCH=x86_64
-ENV NB_THREADS=32
+ENV NB_THREADS=16
 
 # Install required packages
 RUN apt-get update && apt-get install -y software-properties-common \
@@ -75,6 +75,15 @@ RUN git clone https://github.com/BugraEryilmaz/Vtb_src.git /tmp/vtb \
     && cp Vtb /usr/bin \
     && rm -rf /tmp/vtb
 
+# Compile Vtb (faster version)
+RUN git clone https://github.com/BugraEryilmaz/Vtb_src.git /tmp/vtb \
+    && cd /tmp/vtb \
+    && sed -i '/std::this_thread::sleep_until(start +/{N;/\n[[:space:]]*std::chrono::microseconds(100 \* counter));/d}' verilator.cpp \
+    && make -f Vtb.mk -j "$NB_THREADS" \
+    && chmod +x Vtb \
+    && cp Vtb /usr/bin/Vtb_fast \
+    && rm -rf /tmp/vtb
+
 # Set up X11 Forwarding
 RUN echo "X11Forwarding yes" >> /etc/ssh/sshd_config
 
@@ -97,7 +106,13 @@ COPY project.tar.xz $SRC/lab1/
 COPY gol-template.s $SRC/lab1/gol.s
 
 RUN tar xf $SRC/lab1/project.tar.xz -C $SRC/lab1/ \
-    && cp /usr/bin/Vtb $SRC/lab1/
+    && cp /usr/bin/Vtb $SRC/lab1/Vtb
+
+## Lab1 faster version (softlinks to the original files, except faster Vtb)
+RUN mkdir -p $SRC/lab1_fast \
+    && cd $SRC/lab1_fast \
+    && find ../lab1 -type f ! -name 'Vtb' -exec ln -s {} ./ \; \
+    && ln -s /usr/bin/Vtb_fast Vtb
 
 RUN chown -R $USERNAME:$USERNAME $SRC
 

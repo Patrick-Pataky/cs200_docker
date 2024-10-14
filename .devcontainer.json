@@ -3,11 +3,16 @@
     "image": "ppataky5/cs200:latest",
     "remoteUser": "root",
     "containerUser": "cs200",
+
     // share the local workspace folder with the container
     "workspaceMount": "source=${localWorkspaceFolder},target=/home/cs200/workspace,type=bind",
+    
     "workspaceFolder": "/home/cs200/workspace",
+    "initializeCommand": "docker pull ppataky5/cs200:latest",
+    
     // postAttachCommand: copy templates to workspace only if not overwriting existing files
     "postAttachCommand": "rsync -a --ignore-existing /tmp/cs200/src/ /home/cs200/workspace",
+    
     "customizations": {
         "vscode": {
             "settings": {

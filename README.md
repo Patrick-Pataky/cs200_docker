@@ -5,7 +5,7 @@
   - [Install docker desktop and devcontainer extension for VSCode](#install-docker-desktop-and-devcontainer-extension-for-vscode)
   - [Launch the devcontainer](#launch-the-devcontainer)
   - [Working with the container](#working-with-the-container)
-- [Building the container from source](#building-the-container-from-source)
+- [(Optional) Building the container from source](#optional-building-the-container-from-source)
 
 ## How to use
 
@@ -50,7 +50,7 @@ Do NOT modify the `lab1_fast` directory while the container is NOT running, as i
 
 Good luck!
 
-## Building the container from source
+## (Optional) Building the container from source
 
 First, restore the source files, if they were hidden during the initial setup:
 ```bash

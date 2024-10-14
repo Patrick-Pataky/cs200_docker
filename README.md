@@ -54,6 +54,7 @@ Good luck!
 
 First, restore the source files, if they were hidden during the initial setup:
 ```bash
+sudo chown -R $USER:$USER ./
 git sparse-checkout disable
 ```
 

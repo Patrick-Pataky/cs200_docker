@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y software-properties-common \
     && add-apt-repository ppa:ubuntu-toolchain-r/test
 
 RUN apt-get update && apt-get install -y sudo autoconf automake rsync software-properties-common \
-    autotools-dev curl python3 python3-pip libmpc-dev libmpfr-dev libgmp-dev \
+    autotools-dev curl python3 python3-pip libmpc-dev libmpfr-dev libgmp-dev nano \
     gawk build-essential bison flex texinfo gperf libtool patchutils bc \
     zlib1g-dev libexpat-dev ninja-build git cmake make libglib2.0-dev libslirp-dev \
     openssh-server gtkwave jq iverilog g++-13 gcc-13 libdw-dev libelf-dev help2man perl ccache \
@@ -38,13 +38,25 @@ RUN cd /tmp/riscv-gnu-toolchain \
     && rm -rf /tmp/riscv-gnu-toolchain
 
 # Install verible
+ENV FLAGS=/home/$USERNAME/flags.txt
+
+RUN cat <<EOF > $FLAGS
+-always-comb
++port-name-suffix
+signal-name-style="style_regex:[a-z_0-9]+"
+-explicit-parameter-storage-type
++parameter-name-style="localparam_style:ALL_CAPS;parameter_style:ALL_CAPS"
+EOF
+
 RUN mkdir /opt/verible \
     && curl -s https://api.github.com/repos/chipsalliance/verible/releases/latest | \
        jq -r ".assets[] | select(.name | test(\"${ARCH}\")) | .browser_download_url" | \
        xargs curl -L -o /tmp/verible.tar.gz \
-    && tar xf /tmp/verible.tar.gz -C /opt/verible \
+    && tar xf /tmp/verible.tar.gz -C /opt/verible --strip-components=1 \
+    && chown -R $USERNAME:$USERNAME /opt/verible \
     && rm /tmp/verible.tar.gz \
-    && echo "export PATH=\$PATH:/opt/verible/bin" >> /home/$USERNAME/.bashrc
+    && echo "export PATH=\$PATH:/opt/verible/bin" >> /home/$USERNAME/.bashrc \
+    && echo "alias lint='verible-verilog-lint --rules_config=$FLAGS'" >> /home/$USERNAME/.bashrc
 
 # Install cppdap
 RUN git clone https://github.com/google/cppdap.git /tmp/cppdap \
@@ -102,17 +114,28 @@ USER root
 ENV SRC=/tmp/$USERNAME/src
 RUN bash -c 'mkdir -p $SRC/lab{1..3}'
 
-COPY project.tar.xz $SRC/lab1/
-COPY gol-template.s $SRC/lab1/gol.s
+## Lab1
+COPY lab1/project.tar.xz $SRC/lab1/
+COPY lab1/gol-template.s $SRC/lab1/gol.s
 
 RUN tar xf $SRC/lab1/project.tar.xz -C $SRC/lab1/ \
     && cp /usr/bin/Vtb $SRC/lab1/Vtb
 
-## Lab1 faster version (softlinks to the original files, except faster Vtb)
+### Lab1 faster version (softlinks to the original files, except faster Vtb)
 RUN mkdir -p $SRC/lab1_fast \
     && cd $SRC/lab1_fast \
     && find ../lab1 -type f ! -name 'Vtb' -exec ln -s {} ./ \; \
     && ln -s /usr/bin/Vtb_fast Vtb
+
+## Lab2
+COPY lab2/part1/template.tar.xz $SRC/lab2/template1.tar.xz
+COPY lab2/part2/template.tar.xz $SRC/lab2/template2.tar.xz
+COPY lab2/part3/template.tar.xz $SRC/lab2/template3.tar.xz
+
+RUN tar xf $SRC/lab2/template1.tar.xz -C $SRC/lab2/ \
+    && tar xf $SRC/lab2/template2.tar.xz -C $SRC/lab2/ \
+    && tar xf $SRC/lab2/template3.tar.xz -C $SRC/lab2/ \
+    && rm $SRC/lab2/template*.tar.xz
 
 RUN chown -R $USERNAME:$USERNAME $SRC
 

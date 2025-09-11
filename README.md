@@ -12,16 +12,10 @@
 ### Initial setup
 Go to the directory where you want to work on the labs and run the following command:
 ```bash
-git clone https://github.com/Patrick-Pataky/cs200_docker.git --no-checkout
+curl -LO https://github.com/Patrick-Pataky/cs200_docker/releases/latest/download/default.devcontainer.json
+mv default.devcontainer.json .devcontainer.json
 
-cd cs200_docker
-```
-
-To hide the source files (skip only if you plan to build the container on your own):
-```bash
-git sparse-checkout init --cone
-git sparse-checkout set .devcontainer.json
-git checkout
+docker pull ppataky5/cs200:latest
 ```
 
 And finally, open the folder in VSCode.
@@ -52,21 +46,24 @@ Good luck!
 
 ## (Optional) Building the container from source
 
-First, restore the source files, if they were hidden during the initial setup:
-```bash
-sudo chown -R $USER:$USER ./
-git sparse-checkout disable
+First, add lab files to the repository, under the `src` folder, from Moodle. You should follow the following structure:
 ```
-
+src
+├── Dockerfile
+├── lab1
+│   └── ...
+├── lab2
+│   └── ...
+└── lab3
+    └── ...
+```
 Then, build the container:
 ```bash
+cd src
 docker build -t cs200 .
 ```
 
-Note that this will take a while, especially the RISC-V toolchain installation. In case you get errors or it is too slow, you can update the amount of parallel jobs in the `Dockerfile`:
-```Dockerfile
-ENV NB_THREADS=16
-```
+Note that this will take a while, especially the RISC-V toolchain installation.
 
 Finally, update the `.devcontainer.json` file to use the local image:
 ```json

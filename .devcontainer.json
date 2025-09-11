@@ -2,7 +2,7 @@
     "name": "cs200",
     "image": "ppataky5/cs200:latest",
 
-    "remoteUser": "cs200",
+    "remoteUser": "root",
     "containerUser": "cs200",
 
     // share the local workspace folder with the container

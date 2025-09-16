@@ -12,6 +12,8 @@ jobs:
           mkdir -p ./src/lab1
           curl -fSL -o ./src/lab1/gol-template.s https://github.com/Patrick-Pataky/cs200_docker/releases/latest/download/gol-template.s
           curl -fSL -o ./src/lab1/project.tar.gz https://github.com/Patrick-Pataky/cs200_docker/releases/latest/download/project.tar.gz
+          ls
+          ls ./src
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v4

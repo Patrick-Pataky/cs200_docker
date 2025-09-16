@@ -37,7 +37,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./src
-          file: ./src/Dockerfile
+          file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           load: true
           tags: ${{ vars.DOCKERHUB_USERNAME }}/cs200:latest

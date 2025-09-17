@@ -8,7 +8,6 @@ ENV PASSWORD=epfl
 
 # Must be x86_64, macOS, or arm64
 ENV ARCH=x86_64
-ENV NB_THREADS=16
 
 # Install required packages
 RUN apt-get update && apt-get install -y software-properties-common \
@@ -34,7 +33,7 @@ RUN useradd -m -d /home/$USERNAME -s /bin/bash -G sudo $USERNAME \
 RUN git clone https://github.com/riscv/riscv-gnu-toolchain /tmp/riscv-gnu-toolchain
 RUN cd /tmp/riscv-gnu-toolchain \
     && ./configure --prefix=/opt/riscv \
-    && make linux -j "$NB_THREADS" \
+    && make linux -j$(nproc) \
     && rm -rf /tmp/riscv-gnu-toolchain
 
 # Install verible
@@ -65,24 +64,24 @@ RUN git clone https://github.com/google/cppdap.git /tmp/cppdap \
     && mkdir build \
     && cd build \
     && cmake .. \
-    && make install -j "$NB_THREADS" \
+    && make install -j$(nproc) \
     && rm -rf /tmp/cppdap
 
 # Install Verilator
 RUN git clone https://github.com/verilator/verilator /tmp/verilator \
     && cd /tmp/verilator \
     && unset VERILATOR_ROOT \
-    && git checkout stable \
+    && git checkout v5.032 \
     && autoconf \
     && ./configure \
-    && make -j "$NB_THREADS" \
+    && make -j$(nproc) \
     && make install \
     && rm -rf /tmp/verilator
 
 # Compile Vtb (RISC-V debugger)
 RUN git clone https://github.com/BugraEryilmaz/Vtb_src.git /tmp/vtb \
     && cd /tmp/vtb \
-    && make -f Vtb.mk -j "$NB_THREADS" \
+    && make -f Vtb.mk -j$(nproc) \
     && chmod +x Vtb \
     && cp Vtb /usr/bin \
     && rm -rf /tmp/vtb
@@ -91,7 +90,7 @@ RUN git clone https://github.com/BugraEryilmaz/Vtb_src.git /tmp/vtb \
 RUN git clone https://github.com/BugraEryilmaz/Vtb_src.git /tmp/vtb \
     && cd /tmp/vtb \
     && sed -i '/std::this_thread::sleep_until(start +/{N;/\n[[:space:]]*std::chrono::microseconds(100 \* counter));/d}' verilator.cpp \
-    && make -f Vtb.mk -j "$NB_THREADS" \
+    && make -f Vtb.mk -j$(nproc) \
     && chmod +x Vtb \
     && cp Vtb /usr/bin/Vtb_fast \
     && rm -rf /tmp/vtb
@@ -112,7 +111,7 @@ USER root
 
 # Set up CS200 environment
 ENV SRC=/tmp/$USERNAME/src
-RUN bash -c 'mkdir -p $SRC/lab{1..3}'
+RUN bash -c 'mkdir -p $SRC/lab1'
 
 ## Lab1
 COPY lab1/project.tar.gz $SRC/lab1/
